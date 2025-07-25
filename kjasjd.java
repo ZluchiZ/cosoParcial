@@ -5,7 +5,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class kjasjd {
-
     static Scanner scanner = new Scanner(System.in);
     static ArrayList<String> pendientes = new ArrayList<>();
     static ArrayList<String> enProceso = new ArrayList<>();
@@ -19,7 +18,7 @@ public class kjasjd {
             if (!iniciarSesion()) return;
             System.out.println("Bienvenido al sistema de control de tareas estilo Kanban!");
 
-            int opcion;
+            int opcion=0;
             do {
                 mostrarMenu();
                 try {
@@ -86,6 +85,10 @@ public class kjasjd {
     }
 
     public static void moverTarea(ArrayList<String> origen, ArrayList<String> destino, String nombreOrigen, String nombreDestino) {
+        if (origen.isEmpty()){
+            System.out.println("No hay tareas en " + nombreOrigen + ".");
+            return;
+        }
         int index = buscarTarea(origen, nombreOrigen);
         if (index != -1) {
             String tarea = origen.remove(index);
@@ -148,7 +151,12 @@ public class kjasjd {
             } else {
                 System.out.println("Opcion invalida.");
             }
+            if (lista.isEmpty()){
+            System.out.println("No hay tareas en " + lista + ".");
+            return;
         }
+        }
+        
     }
 
     public static void listarTareas() {
@@ -207,3 +215,4 @@ public class kjasjd {
         return -1;
     }
 }
+
