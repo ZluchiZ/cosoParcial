@@ -1,282 +1,305 @@
 package parcial;
 
 // Importación de clases necesarias
-import java.util.ArrayList;
-import java.util.Scanner;
-
+import java.util.ArrayList;          // 1) Importa la clase ArrayList, que permite crear listas dinámicas de elementos.
+import java.util.Scanner;            // 2) Importa Scanner, que sirve para leer texto desde la consola.
 // Clase principal del sistema Kanban
-public class kjasjd {
+public class kjasjd { // 3) Declaración de la clase principal
 
-	// Scanner global para leer desde consola
-	static Scanner scanner = new Scanner(System.in);
+    static Scanner scanner = new Scanner(System.in);       // 4) Crea un objeto global Scanner para leer todo el tiempol o que escriba el usuario por la consola.
 
-	// Listas que representan las columnas del tablero Kanban
-	static ArrayList<String> pendientes = new ArrayList<>();
-	static ArrayList<String> enProceso = new ArrayList<>();
-	static ArrayList<String> finalizadas = new ArrayList<>();
+    static ArrayList<String>pendientes = new ArrayList<>(),enProceso  = new ArrayList<>(),finalizadas= new ArrayList<>();       // 5) Declara tres listas globales de texto (String):- “pendientes” para tareas nuevas.- “enProceso” para las que ya empezaron.- “finalizadas” para las que ya terminaron.
+ 
+    static String usuario= "a";         // 6) Usuario fijo (login) “a”.
+    static String contrasena= "1";         // 7) Contraseña fija “1”.
 
-	// Credenciales fijas para iniciar sesion
-	static String usuario = "a";
-	static String contrasena = "1";
+    public static void main(String[] args) {// 8) Método principal: punto de entrada del programa.
+        try {                               // 9) Inicia un bloque para atrapar errores inesperados.
+            if (!iniciarSesion())          // 10) Llama a iniciarSesion(); si devuelve false, sale del programa.
+                return;
 
-	// Metodo principal del programa
-	public static void main(String[] args) {
-	    try {
-	        // Se solicita al usuario iniciar sesion
-	        if (!iniciarSesion()) return;
+            System.out.println("Bienvenido al sistema de control de tareas estilo Kanban!");            // 11) Muestra mensaje de bienvenida.
+            int opcion;                    // 12) Declara la variable que guardará la elección del usuario.
 
-	        System.out.println("Bienvenido al sistema de control de tareas estilo Kanban!");
+            do {                           // 13) Inicia un bucle que se repite hasta que opcion sea 7.
+                mostrarMenu();             // 14) Muestra en pantalla las opciones disponibles.
+               
+                opcion = leerEnteroConRango("", 1, 7);   // 15) Pide al usuario un número entre 1 y 7; no avanza hasta que sea válido:
 
-	        int opcion;
+                switch(opcion) {          // 16) Decide qué función ejecutar según la opción:
+                    case 1:agregarTarea();     // 16a) Agregar nueva tarea.
+                            break;
+                    case 2:moverTarea(pendientes,enProceso,"Pendiente","En Proceso");             // 16b) Mover de Pendientes a En Proceso.
+                            break;
+                    case 3:moverTarea(enProceso,finalizadas,"En Proceso","Finalizada");             // 16c) Mover de En Proceso a Finalizada.
+                            break;
+                    case 4:modificarTarea();    // 16d) Modificar el texto de una tarea.
+                            break;
+                    case 5: eliminarTarea();     // 16e) Eliminar tarea(s).
+                            break;
+                    case 6: listarTareas();      // 16f) Mostrar todas las tareas.
+                            break;
+                    case 7: if (salir()) {System.out.println("Saliendo del programa...");}
+                            else {System.out.println("Decidite engendro...");opcion=8;}
+                            break;               // 16g) Si elige 7, imprime mensaje y sale del bucle.
+                                }
 
-	        // Bucle del menu principal
-	        do {
-	            mostrarMenu(); // Muestra el menu
+            } while (opcion != 7);       // 17) Repite hasta que opcion sea 7.
 
-	            // Lee la opcion del usuario con validacion
-	            opcion = leerEnteroConRango("Seleccione una opcion: ", 1, 7);
+        } catch (Exception e) {         // 18) Captura cualquier excepción no prevista.
+            System.out.println("Ocurrio un error inesperado: " + e.getMessage());         // 19) Muestra mensaje de error si algo falla.
+               
+        } finally {                     // 20) Bloque que siempre se ejecuta al final:
+            scanner.close();            // 21) Cierra el Scanner para liberar recursos.
+        }
+    }
 
-	            // Ejecuta la opcion elegida
-	            switch (opcion) {
-	                case 1 -> agregarTarea();
-	                case 2 -> moverTarea(pendientes, enProceso, "Pendiente", "En Proceso");
-	                case 3 -> moverTarea(enProceso, finalizadas, "En Proceso", "Finalizada");
-	                case 4 -> modificarTarea();
-	                case 5 -> eliminarTarea();
-	                case 6 -> listarTareas();
-	                case 7 -> System.out.println("Saliendo del programa...");
-	            }
+    public static boolean iniciarSesion() {  // 22) Función para pedir y verificar usuario/clave.
+        int intentos = 3;                    // 23) Permite un máximo de 3 intentos.
 
-	        } while (opcion != 7); // Sale al elegir 7
+        while (intentos-- > 0) {             // 24) Bucle que resta un intento cada vez.
+            System.out.print("User: ");      // 25) Pregunta el usuario.
+            String u = scanner.nextLine();   // 26) Lee lo que escribe el usuario.
 
-	    } catch (Exception e) {
-	        // Captura errores inesperados
-	        System.out.println("Ocurrio un error inesperado: " + e.getMessage());
-	    } finally {
-	        // Cierra el scanner
-	        scanner.close();
-	    }
-	}
+            System.out.print("Password: ");  // 27) Pregunta la contraseña.
+            String c = scanner.nextLine();   // 28) Lee la contraseña.
 
-	// Metodo que solicita usuario y contrasena
-	public static boolean iniciarSesion() {
-	    int intentos = 3;
+            if (u.equals(usuario)&&c.equals(contrasena))        // 29) Compara con los datos fijos.
+                return true;                // 30) Si coinciden, devuelve true (login exitoso).
 
-	    while (intentos-- > 0) {
-	        System.out.print("User: ");
-	        String u = scanner.nextLine();
+            System.out.println("Credenciales incorrectas. " + "Intentos restantes: " + intentos);    // 31) Si no coinciden, informa y sigue al siguiente intento:
+               
+        }
+       
+        System.out.println("Demasiados intentos fallidos. Cerrando programa.");  // 32) Si se acaban los intentos:
+        return false;                       // 33) Devuelve false (no pudo iniciar sesión).
+    }
 
-	        System.out.print("Password: ");
-	        String c = scanner.nextLine();
+    public static void mostrarMenu() {      // 34) Función para imprimir el menú.
+        System.out.println("\nMenu de Opciones:");
+        System.out.println("1. Agregar tarea nueva");
+        System.out.println("2. Mover tarea a En Proceso");
+        System.out.println("3. Finalizar tarea");
+        System.out.println("4. Modificar tarea");
+        System.out.println("5. Eliminar tarea");
+        System.out.println("6. Listar tareas");
+        System.out.println("7. Salir");
+    }
 
-	        // Verifica credenciales
-	        if (u.equals(usuario) && c.equals(contrasena)) return true;
+    public static void agregarTarea() {      // 35) Función para añadir una nueva tarea.
+        System.out.print("Ingrese el nombre de la nueva tarea: ");
+        String tarea=scanner.nextLine();   // 36) Lee el texto de la tarea.
 
-	        System.out.println("Credenciales incorrectas. Intentos restantes: " + intentos);
-	    }
+        System.out.println("Tarea ingresada: \"" + tarea + "\"");  // 37) Muestra lo que escribió.
+        System.out.print("Esta seguro que desea agregar esta tarea? (s/n): ");
+        String confirmacion=scanner.nextLine().trim().toLowerCase();              // 38) Lee “s” o “n”.
+           
 
-	    // Si falla tres veces
-	    System.out.println("Demasiados intentos fallidos. Cerrando programa.");
-	    return false;
-	}
+        if (confirmacion.equals("s")) {      // 39) Si confirma “s”:
+            pendientes.add(tarea);           // 40) Añade a la lista “pendientes”.
+            System.out.println("Tarea agregada a la lista de Pendientes.");
+        }else {
+            System.out.println("Operacion cancelada. La tarea no fue agregada.");
+               
+        }
+    }
 
-	// Muestra el menu de opciones
-	public static void mostrarMenu() {
-	    System.out.println("\nMenu de Opciones:");
-	    System.out.println("1. Agregar tarea nueva");
-	    System.out.println("2. Mover tarea a En Proceso");
-	    System.out.println("3. Finalizar tarea");
-	    System.out.println("4. Modificar tarea");
-	    System.out.println("5. Eliminar tarea");
-	    System.out.println("6. Listar tareas");
-	    System.out.println("7. Salir");
-	}
+    public static void moverTarea(ArrayList<String> origen,ArrayList<String> destino,String nombreOrigen,String nombreDestino) {         // 41) Función para mover tareas.
 
-	// Agrega una tarea a la lista de pendientes
-	public static void agregarTarea() {
-	    System.out.print("Ingrese el nombre de la nueva tarea: ");
-	    String tarea = scanner.nextLine();
-	    pendientes.add(tarea); // Agrega a la lista
-	    System.out.println("Tarea agregada a la lista de Pendientes.");
-	}
+        if (origen.isEmpty()) {            // 42) Si la lista origen está vacía:
+            System.out.println("No hay tareas en " + nombreOrigen + ".");    
+            return;                        // 43) Sale sin hacer nada.
+        }
+        int index = buscarTarea(origen, nombreOrigen);// 44) Llama a buscarTarea() para elegir tarea.
 
-	// Mueve una tarea entre listas con confirmacion del usuario
-	public static void moverTarea(ArrayList<String> origen, ArrayList<String> destino, String nombreOrigen, String nombreDestino) {
-	    // Si la lista de origen esta vacia, no se puede mover nada
-	    if (origen.isEmpty()) {
-	        System.out.println("No hay tareas en " + nombreOrigen + ".");
-	        return;
-	    }
+        if (index != -1) {                  // 45) Si encontró un índice válido:
+            String tarea = origen.get(index);// 46) Toma el nombre de la tarea.
 
-	    // Busca la tarea que se desea mover (por nombre o posicion)
-	    int index = buscarTarea(origen, nombreOrigen);
+            System.out.println("Tarea seleccionada: \"" + tarea + "\"");        // 47) Pregunta confirmación antes de mover:
+            System.out.print("Esta seguro que desea mover esta tarea de " + nombreOrigen + " a " + nombreDestino + " ? (s/n): ");
+ 
+            String confirmacion=scanner.nextLine().trim().toLowerCase();
 
-	    if (index != -1) {
-	        String tarea = origen.get(index); // Obtiene el nombre de la tarea seleccionada
+            if (confirmacion.equals("s")) { // 48) Si confirma “s”:
+                origen.remove(index);      // 49) Quita de la lista origen.
+                destino.add(tarea);        // 50) Agrega a la lista destino.
+                System.out.println("Tarea movida de " + nombreOrigen + " a " + nombreDestino + ".");
+               
+            } else {
+                System.out.println("Operacion cancelada. La tarea no fue movida.");
+                   
+            }
+        }
+    }
 
-	        // Muestra la tarea y pide confirmacion
-	        System.out.println("Tarea seleccionada: \"" + tarea + "\"");
-	        System.out.print("¿Esta seguro que desea mover esta tarea de " + nombreOrigen + " a " + nombreDestino + "? (s/n): ");
-	        String confirmacion = scanner.nextLine().trim().toLowerCase();
+    public static void modificarTarea() {   // 51) Función para renombrar una tarea.
+        System.out.println("En que lista esta la tarea a modificar?");
+        System.out.println("1. Pendientes\n2. En Proceso");
 
-	        // Si el usuario confirma, se realiza el movimiento
-	        if (confirmacion.equals("s")) {
-	            origen.remove(index); // Quita de la lista origen
-	            destino.add(tarea);   // Agrega a la lista destino
-	            System.out.println("Tarea movida de " + nombreOrigen + " a " + nombreDestino + ".");
-	        } else {
-	            // Si el usuario no confirma, se cancela la operacion
-	            System.out.println("Operacion cancelada. La tarea no fue movida.");
-	        }
-	    }
-	}
+        int opcion = leerEnteroConRango("Seleccione una opcion: ", 1, 2);        // 52) Pide 1 o 2 vali­dado.
 
-	// Permite modificar el nombre de una tarea
-	public static void modificarTarea() {
-	    System.out.println("¿En que lista esta la tarea a modificar?");
-	    System.out.println("1. Pendientes\n2. En Proceso");
+        ArrayList<String> lista=(opcion == 1) ? pendientes : enProceso;        // 53) Elige la lista según la opción.
+         
 
-	    int opcion = leerEnteroConRango("Seleccione una opcion: ", 1, 2);
+        int index = buscarTarea(lista,"modificar");     // 54) Busca la tarea en esa lista.  
+        if (index != -1) {                 // 55) Si la encuentra:
+            System.out.print("Nuevo nombre de la tarea: ");
+            String nuevoNombre=scanner.nextLine();        // 56) Lee el nuevo texto.
 
-	    ArrayList<String> lista = (opcion == 1) ? pendientes : enProceso;
+            lista.set(index, nuevoNombre); // 57) Reemplaza el elemento en la lista.
+            System.out.println("Tarea modificada correctamente.");
+               
+        }
+    }
 
-	    int index = buscarTarea(lista, "modificar");
-	    if (index != -1) {
-	        System.out.print("Nuevo nombre de la tarea: ");
-	        String nuevoNombre = scanner.nextLine();
-	        lista.set(index, nuevoNombre); // Modifica la tarea
-	        System.out.println("Tarea modificada correctamente.");
-	    }
-	}
+    public static void eliminarTarea() {    // 58) Función para eliminar tarea(s).
+       
+        int opcion = leerEnteroConRango(    // 59) Ofrece cuatro opciones, incluida “todas las listas”:
+            "De que lista desea eliminar la tarea?\n" +
+            "1. Pendientes\n" +
+            "2. En Proceso\n" +
+            "3. Finalizadas\n" +
+            "4. Todas las listas\n" +
+            "Seleccione una opcion: ", 1, 4
+        );
 
-	// Elimina tareas de una o todas las listas
-	public static void eliminarTarea() {
-	    // Muestra el menu de seleccion de lista
-	    int opcion = leerEnteroConRango(
-	        "¿De que lista desea eliminar la tarea?\n" +
-	        "1. Pendientes\n2. En Proceso\n3. Finalizadas\n4. Todas las listas\nSeleccione una opcion: ",
-	        1, 4
-	    );
+        if (opcion >= 1 && opcion <= 3) {   // 60) Si elige una lista específica:
+            ArrayList<String> lista = switch (opcion) {
+                case 1 -> pendientes;
+                case 2 -> enProceso;
+                default-> finalizadas;
+            };
 
-	    if (opcion >= 1 && opcion <= 3) {
-	        // Selecciona la lista correspondiente segun la opcion
-	        ArrayList<String> lista = switch (opcion) {
-	            case 1 -> pendientes;
-	            case 2 -> enProceso;
-	            case 3 -> finalizadas;
-	            default -> null;
-	        };
+            if (lista.isEmpty()) {         // 61) Si la lista está vacía:
+                System.out.println("No hay tareas en esta lista.");
+                return;
+            }
 
-	        if (lista.isEmpty()) {
-	            System.out.println("No hay tareas en esta lista.");
-	            return;
-	        }
+            int tipo = leerEnteroConRango("Desea eliminar una tarea especifica (1) o todas (2)?: ",1, 2 );// 62) Pregunta eliminar una o todas:
+           
+            if (tipo == 1) {               // 63) Si es específica:
+                int index = buscarTarea(lista, "eliminar");   // 64) Llama a buscarTarea para elegir índice.
+                   
+                if (index != -1) {
+                    String tareaAEliminar = lista.get(index); // 65) Nombre tarea.
+                    System.out.println("Tarea seleccionada: \"" + tareaAEliminar + "\"");
+                    System.out.print("Esta seguro que desea eliminar esta tarea? (s/n): ");
+                   
+                    String confirmacion =scanner.nextLine().trim().toLowerCase();
 
-	        // Pregunta si se quiere eliminar una o todas
-	        int tipo = leerEnteroConRango("¿Desea eliminar una tarea especifica (1) o todas (2)?: ", 1, 2);
+                    if (confirmacion.equals("s")) {
+                        lista.remove(index);      // 66) Elimina esa tarea.
+                        System.out.println("Tarea eliminada correctamente.");
+                    }else {
+                        System.out.println("Operacion cancelada. La tarea no fue eliminada.");
+                    }
+                }
+           }else {                       // 67) Si es “todas” de esa lista:
+                System.out.print("Esta seguro que desea eliminar TODAS las tareas de esta lista? (s/n): ");
+                   
+                String confirmacion=scanner.nextLine().trim().toLowerCase();
 
-	        if (tipo == 1) {
-	            int index = buscarTarea(lista, "eliminar");
-	            if (index != -1) {
-	                String tareaAEliminar = lista.get(index);
-	                System.out.println("Tarea seleccionada: \"" + tareaAEliminar + "\"");
-	                System.out.print("¿Esta seguro que desea eliminar esta tarea? (s/n): ");
-	                String confirmacion = scanner.nextLine().trim().toLowerCase();
+                if (confirmacion.equals("s")) {
+                    lista.clear();         // 68) Vacía la lista.
+                    System.out.println("Todas las tareas han sido eliminadas.");
+               }else {
+                    System.out.println("Operacion cancelada. No se elimino ninguna tarea.");
+                }
+            }
+        }
 
-	                if (confirmacion.equals("s")) {
-	                    lista.remove(index);
-	                    System.out.println("Tarea eliminada correctamente.");
-	                } else {
-	                    System.out.println("Operacion cancelada. La tarea no fue eliminada.");
-	                }
-	            }
-	        } else {
-	            System.out.print("¿Esta seguro que desea eliminar TODAS las tareas de esta lista? (s/n): ");
-	            String confirmacion = scanner.nextLine().trim().toLowerCase();
+        if (opcion == 4) {               // 69) Si elige “Todas las listas”:
+            System.out.print("Esta seguro que desea eliminar TODAS las tareas de TODAS las listas? (s/n): ");
+            String confirmacion =scanner.nextLine().trim().toLowerCase();
 
-	            if (confirmacion.equals("s")) {
-	                lista.clear();
-	                System.out.println("Todas las tareas han sido eliminadas.");
-	            } else {
-	                System.out.println("Operacion cancelada. No se elimino ninguna tarea.");
-	            }
-	        }
-	    }
+            if (confirmacion.equals("s")) {
+                pendientes.clear();    // 70) Borra todas de “pendientes”.
+                enProceso.clear();     // 71) Borra todas de “enProceso”.
+                finalizadas.clear();   // 72) Borra todas de “finalizadas”.
+                System.out.println("Todas las tareas de todas las listas han sido eliminadas.");
+            } else {
+                System.out.println("Operacion cancelada. No se elimino ninguna tarea.");
+            }
+        }
+    }
 
-	    // Opcion para eliminar todas las tareas de todas las listas
-	    if (opcion == 4) {
-	        System.out.print("¿Esta seguro que desea eliminar TODAS las tareas de TODAS las listas? (s/n): ");
-	        String confirmacion = scanner.nextLine().trim().toLowerCase();
+    public static void listarTareas() {     // 73) Función para mostrar tareas.
+        System.out.println("Que lista desea visualizar?");
+        System.out.println("1. Pendientes\n2. En Proceso\n3. Finalizadas\n4. Todas");
+        int opcion = leerEnteroConRango("Seleccione una opcion: ", 1, 4);
 
-	        if (confirmacion.equals("s")) {
-	            pendientes.clear();
-	            enProceso.clear();
-	            finalizadas.clear();
-	            System.out.println("Todas las tareas de todas las listas han sido eliminadas.");
-	        } else {
-	            System.out.println("Operacion cancelada. No se elimino ninguna tarea.");
-	        }
-	    }
-	}
 
-	// Lista tareas por columna o todas
-	public static void listarTareas() {
-	    System.out.println("¿Que lista desea visualizar?");
-	    System.out.println("1. Pendientes\n2. En Proceso\n3. Finalizadas\n4. Todas");
+        if (opcion == 1 || opcion == 4)
+            mostrarLista("Pendientes", pendientes);    // 74) Muestra pendientes.
+        if (opcion == 2 || opcion == 4)
+            mostrarLista("En Proceso", enProceso);     // 75) Muestra enProceso.
+        if (opcion == 3 || opcion == 4)
+            mostrarLista("Finalizadas", finalizadas); // 76) Muestra finalizadas.
+    }
 
-	    int opcion = leerEnteroConRango("Seleccione una opcion: ", 1, 4);
+    public static void mostrarLista(String nombre, ArrayList<String> lista) {        // 77) Función que imprime una lista.
+       
+   
+        System.out.println("\nTareas " + nombre + ":"); // 78) Título.
+        for (int i = 0; i < lista.size(); i++) {      // 79) Recorre cada elemento.
+            System.out.println((i + 1) + ". " + lista.get(i));        // 80) Imprime número y texto.
+        }
+        System.out.println("Total: " + lista.size() + " tareas");       // 81) Muestra el conteo.
+    }
 
-	    if (opcion == 1 || opcion == 4) mostrarLista("Pendientes", pendientes);
-	    if (opcion == 2 || opcion == 4) mostrarLista("En Proceso", enProceso);
-	    if (opcion == 3 || opcion == 4) mostrarLista("Finalizadas", finalizadas);
-	}
+    public static int buscarTarea(ArrayList<String> lista, String accion){            // 82) Función para elegir tarea.
+        System.out.println("Buscar por nombre (1) o por posicion (2)?"); // 83) Pregunta método.
+        int tipo = leerEnteroConRango("Seleccione una opcion: ", 1, 2);
 
-	// Muestra tareas de una lista con numeracion
-	public static void mostrarLista(String nombre, ArrayList<String> lista) {
-	    System.out.println("\nTareas " + nombre + ":");
-	    for (int i = 0; i < lista.size(); i++) {
-	        System.out.println((i + 1) + ". " + lista.get(i));
-	    }
-	    System.out.println("Total: " + lista.size() + " tareas");
-	}
+        if (tipo == 1) {              // 84) Si busca por nombre:
+            System.out.print("Ingrese el nombre de la tarea: ");
+            String nombre = scanner.nextLine();
 
-	// Busca una tarea por nombre o posicion
-	public static int buscarTarea(ArrayList<String> lista, String accion) {
-	    System.out.println("Buscar por nombre (1) o por posicion (2)?");
-	    int tipo = leerEnteroConRango("Seleccione una opcion: ", 1, 2);
+            for (int i = 0; i < lista.size(); i++) {
+                if (lista.get(i).equalsIgnoreCase(nombre))
+                return i;         // 85) Devuelve índice si coincide.
+            }
 
-	    if (tipo == 1) {
-	        System.out.print("Ingrese el nombre de la tarea: ");
-	        String nombre = scanner.nextLine();
+       }else {                     // 86) Si busca por posición:
+            System.out.print("Ingrese la posicion de la tarea (1 a " + lista.size() + "): ");
+            int pos = leerEnteroConRango("", 1, lista.size());
+            return pos - 1;          // 87) Ajusta a índice base 0.
+        }
 
-	        for (int i = 0; i < lista.size(); i++) {
-	            if (lista.get(i).equalsIgnoreCase(nombre)) return i;
-	        }
+        System.out.println("Tarea no encontrada.");  // 88) Si no halló nada.
 
-	    } else {
-	        System.out.print("Ingrese la posicion de la tarea (1 a " + lista.size() + "): ");
-	        int pos = leerEnteroConRango("", 1, lista.size());
-	        return pos - 1;
-	    }
+        return -1;                   // 89) Retorna -1 indicando “no la encontró”.
+    }
 
-	    System.out.println("Tarea no encontrada.");
-	    return -1;
-	}
+    public static int leerEnteroConRango(String mensaje, int min, int max) {     // 90) Función para leer un número.
+        int valor;
+        while (true) {                   // 91) Bucle hasta recibir valor válido.
+            try {
+                if (!mensaje.isEmpty())
+                    System.out.print(mensaje); // 92) Imprime el mensaje si lo hay.
+                    valor = Integer.parseInt(scanner.nextLine()      // 93) Lee línea y la convierte a entero.
 
-	// Lee un entero valido dentro de un rango
-	public static int leerEnteroConRango(String mensaje, int min, int max) {
-	    int valor;
-	    while (true) {
-	        try {
-	            if (!mensaje.isEmpty()) System.out.print(mensaje);
-	            valor = Integer.parseInt(scanner.nextLine());
+                );
+                if (valor >= min && valor <= max)
+                return valor;          // 94) Si está en el rango, lo devuelve.
 
-	            if (valor >= min && valor <= max) return valor;
-
-	            System.out.println("Por favor, ingrese un numero entre " + min + " y " + max + ".");
-	        } catch (NumberFormatException e) {
-	            System.out.println("Entrada invalida. Ingrese un numero.");
-	        }
-	    }
-	}
+                System.out.println("Por favor, ingrese un numero entre " + min + " y " + max + ".");
+                   
+            }   catch (NumberFormatException e) {
+                System.out.println("Entrada invalida. Ingrese un numero.");
+                   
+            }
+        }
+    }
+    public static boolean salir (){
+       System.out.println("Estas seguro que quieres salir? (s/n)");
+       String confirmacion = scanner.nextLine().trim().toLowerCase();                // 95) Lee “s” o “n”.
+           
+       if (confirmacion.equals("s")){
+           return true;
+       }
+       else {
+           return false;
+       }
+    }
 }
